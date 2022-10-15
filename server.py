@@ -1,3 +1,5 @@
+lang = "python"
+
 import pickle as cPickle
 
 import time
