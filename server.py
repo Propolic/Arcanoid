@@ -11,26 +11,36 @@ import socket
 
 import sqlite3 as SQL
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
-from PyQt5.QtCore import QCoreApplication
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QGridLayout, QGroupBox
-
-from PyQt5.QtGui import QPixmap, QIcon
-from PyQt5.QtCore import QSize
-
-
 import SocketForPics as SFP
-from work_with_icons import *
+
+global FLAG_online
+FLAG_online = True
+
+if FLAG_online != True:
+    from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout
+    from PyQt5.QtCore import QCoreApplication
+    from PyQt5.QtWidgets import QApplication
+    from PyQt5.QtWidgets import QGridLayout, QGroupBox
+    from PyQt5.QtGui import QPixmap, QIcon
+    from PyQt5.QtCore import QSize
+
+    from work_with_icons import *
 
 
+HOST = socket.gethostname()
+PORT = 9191
 
-HOST, PORT = "localhost", 9191
 data = " ".join(sys.argv[1:])
 global FLAG_shutdown
 FLAG_shutdown = False
 
 
+'''
+import os
+ON_HEROKU = os.environ.get('ON_HEROKU')
+if ON_HEROKU: # get the heroku port
+    port = int(os.environ.get('PORT', 17995)) # as per OP comments default is 17995 else: port = 3000
+'''
 global window
 global bnt3
 global bnt4
@@ -78,6 +88,7 @@ class HandleConn(BaseRequestHandler):
         global window
         global btn3
         global btn4
+        global FLAG_online
 
         # получили информацию от клиента
         # sql_query = str(self.request.recv(1024), 'utf-8') #получили SQL запрос от клиента
@@ -117,7 +128,8 @@ class HandleConn(BaseRequestHandler):
                     def_size_icon = 50
                     size_icon = 50
                     print(str(data[:20]))
-                    btn3 = set_icon_from_blob(btn3, data, def_size_icon)
+                    if FLAG_online == False:
+                        btn3 = set_icon_from_blob(btn3, data, def_size_icon)
                     my_pics_socket.send_msg(data)
         # отправить клиенту список весов     def_get_weights_list
         elif sql_query == self.def_get_weights_list:
@@ -350,7 +362,11 @@ def run():
     server_thread = threading.Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
-    print("Цикл сервера, работающий в потоке:", server_thread.name)
+    print("Запустили серверр, работающий в потоке: ", server_thread.name)
+    global FLAG_shutdown
+    while FLAG_shutdown != True:
+        # запустили бесконечный цикл сервера
+        pass
 
 #    server.serve_forever()
 
@@ -427,7 +443,7 @@ def create_test_window():
 
 def main():
     run()
-    create_test_window()
+    # create_test_window()
 
     pass
 

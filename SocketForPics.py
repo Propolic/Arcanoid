@@ -58,13 +58,18 @@ class Socket4Pics():
     def recvall(self, n):
         # Функция для получения n байт или возврата None если получен EOF
         data = b''
-        while len(data) < n:
-            packet = self._sock.recv(n - len(data))
-            if packet == b'0': # получено сообщение о прекращении сеанса
-                return b'0'
-            if not packet:
-                return None
-            data += packet
+        try:
+            while len(data) < n:
+                packet = self._sock.recv(n - len(data))
+                if packet == b'0': # получено сообщение о прекращении сеанса
+                    return b'0'
+                if not packet:
+                    return None
+                data += packet
+        except:
+            print ("Ошибка в SocketForPics.recvall(self, n)")
+            data = b''
+
         return data
     '''
     def recvall_wo_cnt_bytes(self, data):

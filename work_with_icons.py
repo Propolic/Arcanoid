@@ -4,7 +4,6 @@ from PyQt5.QtCore import QSize
 
 def convert_Blob_To_Icon (blob):
     pm = QPixmap()
-#    pm.loadFromData(bytes(blob, encoding = "utf-8"))
     pm.loadFromData(bytes(blob))
     icon = QIcon(pm)
     return icon
